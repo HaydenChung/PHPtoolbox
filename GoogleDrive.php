@@ -4,7 +4,9 @@ class GoogleDrive{
 
     //Every public function name in the class start with a undersorce,and private function vice versa.
     //This is because of two methods to catch all Exception thorw inside this class.(check __call() and __callStatic() for detail)
-    //However,all public function should invoke normally without the undersorce, eg. $GoogleDrive::getInstance();
+    //However,all public function should invoke normally without the undersorce, 
+    //eg. $googleDrive = GoogleDrive::getInstance();
+    //$googleDrive->pickUser('abc@abc.com');
 
     private $_google,
     $_service,
@@ -39,6 +41,7 @@ class GoogleDrive{
         }catch (Exception $e){
             return false;
         }
+        throw new BadMethodCallException('Uncaught Error: Call to undefined method GoogleDrive::'.$name.'()');
     }
 
     public function __callStatic($name, $args){
@@ -49,6 +52,7 @@ class GoogleDrive{
         }catch (Exception $e){
             return false;
         }
+        throw new BadMethodCallException('Uncaught Error: Call to undefined method GoogleDrive::'.$name.'()');
     }
 
     public function _pickUser($email){
