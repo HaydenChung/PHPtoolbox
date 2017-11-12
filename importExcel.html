@@ -1,0 +1,93 @@
+<form action='' method='post' enctype="multipart/form-data">
+    <input type='file' name='upload_file'>
+    <input type='submit'>
+</form>
+
+<script src="./js/libraries/js-xlsx-master/dist/xlsx.full.min.js"></script>
+
+<script>
+    var ConventHandler = function(inputElm) {
+
+    this._tableHeader = ['class','no','eng_name','chi_name','gender','student_number','groupname','teachers','MO0','MO1','MO2','MO3','MO4','MO5','MO6','MO7','TU0','TU1','TU2','TU3','TU4','TU5','TU6','TU7','WE0','WE1','WE2','WE3','WE4','WE5','WE6','WE7','TH0','TH1','TH2','TH3','TH4','TH5','TH6','TH7','FR0','FR1','FR2','FR3','FR4','FR5','FR6','FR7'];
+    this._reader = new FileReader();
+    this._file = null;
+    this._inputElm = typeof inputElm == 'string' ? document.querySelector(inputElm) : inputElm;
+    this._toDo = [];
+
+    if(typeof this._inputElm == 'undefined') throw 'File import field not found!';
+
+
+    this._inputElmOnChangeHandler = function(ev) {
+        var t0 = performance.now();
+        this._file = ev.target.files[0];
+        this._readFile();
+
+        var t1 = performance.now();
+        console.log('file readed, used time:'+(t1-t0)/1000);
+    }.bind(this);
+
+    this._readFile = function() {
+        //Fetch data as ArrayBuffer object
+        return this._reader.readAsArrayBuffer(this._file);
+    }.bind(this);
+
+    this._conventStart = function(ev) {
+        var t0 = performance.now();
+
+        var data = new Uint8Array(ev.target.result);
+        var workbook = XLSX.read(data, {type: 'array'});
+        var result = [];
+
+        Object.keys(workbook.Sheets).forEach(function(key) {
+            result.push(XLSX.utils.sheet_to_json(workbook.Sheets[key], {'raw':false, 'header': this._tableHeader }));
+            if(!isInt(result[result.length-1][0]['no'])) result[result.length-1].shift();
+        }.bind(this));
+
+        var t1 = performance.now();
+
+        console.log('convert to json, used time:'+(t1-t0)/1000);
+
+        console.log(result);
+
+        return result;
+
+
+
+
+        _activityFeed(result).resolve(function(activityFeed){
+            console.log(activityFeed);
+        });
+
+
+
+    }.bind(this);
+
+    this._addOrder = function(orders) {
+        this._toDo.concat(orders); 
+    }.bind(this);
+
+    this.scheduleFeed = function() {
+
+    }.bind(this);
+
+    this.userJoinFeed = function() {
+
+    }.bind(this);
+
+
+    this._reader.addEventListener('load', this._conventStart);
+    this._inputElm.addEventListener('change', this._inputElmOnChangeHandler);
+
+}
+
+function isInt(value) {
+  var x;
+  if (isNaN(value)) {
+    return false;
+  }
+  x = parseFloat(value);
+  return (x || 0) === x;
+}
+
+$convertFile = new ConventHandler('input[name="upload_file"]');
+</script>
